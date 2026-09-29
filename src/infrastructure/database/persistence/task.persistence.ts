@@ -7,7 +7,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { TaskRepository } from '@domain/repositories/task.repository';
 import { Task, TaskDocument } from '../schemas/task.schema';
 import { TaskEntity } from '@domain/entities/task.entity';
-import { DomainTaskMapper } from '@domain/mappers/task.mapper';
+import { TaskUpdateData } from '@domain/repositories/task.repository';
+import { TaskPersistenceMapper } from '../mappers/task-persistence.mapper';
 
 @Injectable()
 export class TaskPersistence implements TaskRepository {
@@ -18,10 +19,9 @@ export class TaskPersistence implements TaskRepository {
   // Main methods
 
   async create(task: TaskEntity): Promise<TaskEntity> {
-    const createTask = DomainTaskMapper.toPersistence(task);
-    await this.taskModel.create(createTask);
+    const createdTask = await this.taskModel.create(TaskPersistenceMapper.toPersistence(task));
     this.logger.log('task created...');
-    return DomainTaskMapper.toDomain(createTask);
+    return TaskPersistenceMapper.toDomain(createdTask);
   }
 
   async findAll(page: number, limit: number, id?: string): Promise<TaskEntity[]> {
@@ -34,11 +34,11 @@ export class TaskPersistence implements TaskRepository {
       .skip((page - 1) * limit)
       .limit(limit)
       .exec();
-    return tasks.map(DomainTaskMapper.toDomain);
+    return tasks.map(TaskPersistenceMapper.toDomain);
   }
 
-  async findAnUpdate(id: string, data: any): Promise<TaskEntity> {
-    const task = await this.taskModel.findByIdAndUpdate(id, data, { new: true });
-    return DomainTaskMapper.toDomain(task);
+  async update(id: string, data: TaskUpdateData): Promise<TaskEntity | null> {
+    const task = await this.taskModel.findByIdAndUpdate(id, TaskPersistenceMapper.toPersistenceUpdate(data), { new: true, runValidators: true });
+    return task ? TaskPersistenceMapper.toDomain(task) : null;
   }
 }

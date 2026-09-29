@@ -1,7 +1,3 @@
-/*
-task Entity
-*/
-
 import { v4 as uuidv4 } from 'uuid';
 import { TaskListEntity } from './value-objects/task-list.entity';
 
@@ -13,7 +9,7 @@ export class TaskEntity {
   private readonly created_at: Date;
   private readonly updated_at: Date;
 
-  constructor(props: { _id: string; name: string; description: string; list: TaskListEntity[]; created_at?: Date; updated_at?: Date }) {
+  constructor(props: { _id?: string; name: string; description: string; list: TaskListEntity[]; created_at?: Date; updated_at?: Date }) {
     this._id = props._id || uuidv4();
     this.name = props.name;
     this.description = props.description;

@@ -1,10 +1,7 @@
-/*
-Task Controller
-*/
 import { ApplicationTaskMapper } from '@application/mappers/task.mapper';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { TaskDto } from '@shared/dtos/taskDto/task.dto';
+import { TaskDto, UpdateTaskDto } from '@shared/dtos/taskDto/task.dto';
 import { CreateTaskUseCase } from '@application/use-cases/task/create-task.use-case';
 import { FindTasksUseCase } from '@application/use-cases/task/find-all-task.use-case';
 import { UpdateTaskUseCase } from '@application/use-cases/task/update-task.use-case';
@@ -24,6 +21,7 @@ export class TaskController {
     const command = ApplicationTaskMapper.toTaskCommand(taskDto);
     return await this.createTaskUseCase.execute(command);
   }
+
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(@Query('page') page = 1, @Query('limit') limit = 10, @Query('id') id = '') {
@@ -32,7 +30,8 @@ export class TaskController {
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  async findAndUpdate(@Param('id') id: string, @Body() taskDto: TaskDto) {
-    return await this.updateTaskUseCase.execute(id, taskDto);
+  async findAndUpdate(@Param('id') id: string, @Body() taskDto: UpdateTaskDto) {
+    const command = ApplicationTaskMapper.toUpdateCommand(taskDto);
+    return await this.updateTaskUseCase.execute(id, command);
   }
 }

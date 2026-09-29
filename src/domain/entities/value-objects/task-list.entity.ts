@@ -1,6 +1,6 @@
 export class TaskListEntity {
   private assignName: string;
-  private function?: string;
+  private function: string;
 
   constructor(props: { assignName: string; function: string }) {
     this.assignName = props.assignName;
@@ -12,7 +12,7 @@ export class TaskListEntity {
     return this.assignName;
   }
 
-  getFunction(): string | undefined {
+  getFunction(): string {
     return this.function;
   }
 }

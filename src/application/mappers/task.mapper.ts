@@ -1,20 +1,27 @@
-import { CreateTaskCommand } from '@application/commands/export-all.commands';
+import { CreateTaskCommand, UpdateTaskCommand } from '@application/commands/export-all.commands';
 import { TaskEntity } from '@domain/entities/task.entity';
 import { ApplicationListMapper } from './complements/list.mapper';
+import { TaskDto, UpdateTaskDto } from '@shared/dtos/taskDto/task.dto';
 
 /*
 Task Application Mapper
 */
 export class ApplicationTaskMapper {
-  static toTaskCommand(data: any): CreateTaskCommand {
-    return new CreateTaskCommand(data._id, data.name, data.description, data.list);
+  static toTaskCommand(data: TaskDto): CreateTaskCommand {
+    return new CreateTaskCommand(data.name, data.description, data.list.map(ApplicationListMapper.toEntity));
   }
-  static toEntity(command: any): TaskEntity {
+  static toUpdateCommand(data: UpdateTaskDto): UpdateTaskCommand {
+    return new UpdateTaskCommand(
+      data.name,
+      data.description,
+      data.list?.map(ApplicationListMapper.toEntity),
+    );
+  }
+  static toEntity(command: CreateTaskCommand): TaskEntity {
     return new TaskEntity({
-      _id: command._id,
       name: command.name,
       description: command.description,
-      list: command.list.map(ApplicationListMapper.toEntity),
+      list: command.list,
     });
   }
 }

@@ -7,5 +7,6 @@ const controllers: any = [TaskController];
 @Module({
   imports: [ApplicationModule],
   controllers: [...controllers],
+  providers: [],
 })
 export class PresentationModule {}

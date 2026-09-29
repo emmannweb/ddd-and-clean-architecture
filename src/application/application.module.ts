@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import use_cases from '@application/use-cases/export-all.use-cases';
-import { DomainModule } from '@domain/domain.module';
+import { InfrastructureModule } from '@infrastructure/infrastructure.module';
 
 @Module({
-  imports: [DomainModule],
+  imports: [InfrastructureModule],
   providers: [...use_cases],
   exports: [...use_cases],
 })

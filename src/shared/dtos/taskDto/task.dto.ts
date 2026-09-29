@@ -2,7 +2,7 @@
 Task Dto
 */
 
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsString, ValidateNested } from 'class-validator';
 
@@ -32,3 +32,5 @@ export class TaskDto {
   @ApiProperty({ type: [TaskListDto] })
   list!: TaskListDto[];
 }
+
+export class UpdateTaskDto extends PartialType(TaskDto) {}
