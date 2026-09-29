@@ -1,10 +1,13 @@
 import { ApplicationTaskMapper } from '@application/mappers/task.mapper';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiPaginatedResponse } from '@infrastructure/decorators/paginated-response.decorator';
 import { TaskDto, UpdateTaskDto } from '@shared/dtos/taskDto/task.dto';
 import { CreateTaskUseCase } from '@application/use-cases/task/create-task.use-case';
-import { FindTasksUseCase } from '@application/use-cases/task/find-all-task.use-case';
+import { FindTasksUseCase } from '@application/use-cases/task/find-tasks.use-case';
 import { UpdateTaskUseCase } from '@application/use-cases/task/update-task.use-case';
+import { TaskQueryDto } from '@shared/dtos/taskDto/task.query.dto';
+import { PaginatedResponseDto } from '@shared/pagination/paginated-response.dto';
 
 @ApiTags('Task')
 @Controller('tasks')
@@ -17,21 +20,22 @@ export class TaskController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() taskDto: TaskDto) {
-    const command = ApplicationTaskMapper.toTaskCommand(taskDto);
+  async create(@Body() request: TaskDto) {
+    const command = ApplicationTaskMapper.toTaskCommand(request);
     return await this.createTaskUseCase.execute(command);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async findAll(@Query('page') page = 1, @Query('limit') limit = 10, @Query('id') id = '') {
-    return await this.findTasksUseCase.execute(page, limit, id);
+  @ApiPaginatedResponse(TaskDto)
+  async findAll(@Query() request: TaskQueryDto): Promise<PaginatedResponseDto<TaskDto>> {
+    return await this.findTasksUseCase.execute(request);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  async findAndUpdate(@Param('id') id: string, @Body() taskDto: UpdateTaskDto) {
-    const command = ApplicationTaskMapper.toUpdateCommand(taskDto);
+  async findAndUpdate(@Param('id') id: string, @Body() request: UpdateTaskDto) {
+    const command = ApplicationTaskMapper.toUpdateCommand(request);
     return await this.updateTaskUseCase.execute(id, command);
   }
 }

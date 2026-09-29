@@ -1,13 +1,14 @@
 # NestJS DDD and Clean Architecture Example
 
-A NestJS task API organized into application, domain, infrastructure, presentation, and shared source areas. It uses MongoDB through Mongoose and publishes an OpenAPI/Swagger interface.
+A NestJS task API organized into application, domain, infrastructure, presentation, and shared layers. It uses MongoDB through Mongoose, validates requests with NestJS's global `ValidationPipe`, and
+publishes OpenAPI documentation through Swagger.
 
 ## Requirements
 
 - Node.js and npm
-- MongoDB, local or hosted
+- A reachable MongoDB instance
 
-## Getting Started
+## Setup
 
 Install dependencies:
 
@@ -15,55 +16,48 @@ Install dependencies:
 npm install
 ```
 
-Create a `.env` file in the project root if you need to configure MongoDB or the listening port:
+The application loads environment variables from a root `.env` file. Both settings below are optional:
 
 ```env
 MONGODB_URI=mongodb://localhost:27017/tasknew
 PORT=3000
 ```
 
-Both values are optional. The application defaults to `mongodb://localhost:27017/tasknew` and port `3000`.
+`MONGODB_URI` defaults to `mongodb://localhost:27017/tasknew`; `PORT` defaults to `3000`.
 
-Start the API in development mode:
+Start in development mode:
 
 ```bash
 npm run start:dev
 ```
 
-Build and run the compiled application:
+Build and start the compiled application:
 
 ```bash
 npm run build
 npm run start:prod
 ```
 
-## API Documentation
+Swagger UI is available at `http://localhost:3000/api`. Use the configured `PORT` if it differs from `3000`.
 
-Swagger UI is available at:
-
-```text
-http://localhost:3000/api
-```
-
-Replace `3000` with the configured `PORT` when using a different port.
-
-## API Routes
+## API
 
 ### Tasks
 
-| Method  | Route        | Description                                   |
-| ------- | ------------ | --------------------------------------------- |
-| `POST`  | `/tasks`     | Create a task                                 |
-| `GET`   | `/tasks`     | List tasks, optionally filtered and paginated |
-| `PATCH` | `/tasks/:id` | Partially update a task                       |
+| Method  | Route        | Status | Description           |
+| ------- | ------------ | ------ | --------------------- |
+| `POST`  | `/tasks`     | `201`  | Create a task         |
+| `GET`   | `/tasks`     | `200`  | List tasks            |
+| `PATCH` | `/tasks/:id` | `200`  | Partially update task |
 
-`GET /tasks` accepts these query parameters:
+`GET /tasks` accepts these pagination query parameters:
 
-| Parameter | Default | Description                       |
-| --------- | ------- | --------------------------------- |
-| `page`    | `1`     | Page number                       |
-| `limit`   | `10`    | Maximum number of tasks to return |
-| `id`      | empty   | Optional task ID filter           |
+| Parameter    | Default | Description                       |
+| ------------ | ------- | --------------------------------- |
+| `pageNumber` | `1`     | Page number                       |
+| `pageSize`   | `10`    | Maximum number of tasks to return |
+
+The list response contains `items`, `pageNumber`, `pageSize`, `totalPages`, and `totalRecords`.
 
 Example create request:
 
@@ -80,7 +74,7 @@ Example create request:
 }
 ```
 
-PATCH accepts any subset of the task fields. For example:
+PATCH accepts a partial task body. For example:
 
 ```json
 {
@@ -90,64 +84,56 @@ PATCH accepts any subset of the task fields. For example:
 
 ### Health
 
-| Method | Route     | Description                                                      |
-| ------ | --------- | ---------------------------------------------------------------- |
-| `GET`  | `/health` | Checks MongoDB and connectivity to the NestJS documentation site |
-
-The health route requires the configured MongoDB connection and outbound connectivity to `https://docs.nestjs.com`.
+`GET /health` checks the MongoDB connection and outbound connectivity to `https://docs.nestjs.com`; both checks must pass for the health check to report success.
 
 ## Project Structure
 
 ```text
 src/
-  app.module.ts                 # Root NestJS module
-  main.ts                       # Application bootstrap, validation pipe, Swagger, and port
+  app.module.ts                 # Root module and feature-module wiring
+  main.ts                       # Bootstrap, validation, Swagger, and HTTP port
   application/
     commands/                   # Use-case input commands
-    mappers/                    # Request/command and domain mapping
-    use-cases/                  # Task application workflows
+    errors/                     # Application errors
+    mappers/                    # Domain and DTO mapping
+    use-cases/                  # Task workflows
   domain/
     entities/                   # Task entity and task-list value object
-    repositories/                # Task repository contract
-    tokens/                      # Dependency injection token for the repository
+    repositories/               # Task repository contract
+    tokens/                     # Repository injection token
   infrastructure/
-    database/
-      connection/                # MongoDB connection setup
-      mappers/                   # Domain-to-Mongo persistence mapping
-      persistence/               # Mongoose repository implementation
-      schemas/                   # Mongoose schemas
-    documentation/               # Swagger configuration
-    health/                      # Health endpoint and module
+    database/                   # MongoDB connection, schemas, persistence, and mappers
+    documentation/              # Swagger configuration
+    health/                     # Health endpoint and checks
   presentation/
-    controllers/                 # HTTP task controller
+    controllers/                # HTTP task controller
   shared/
-    dtos/                        # Request DTOs and validation decorators
-    env/                         # Environment configuration
-    interfaces/                  # Shared configuration interfaces
-
+    dtos/                       # Request and response DTOs
+    env/                        # Environment configuration
+    pagination/                 # Paginated response DTO
 test/
-  app.e2e-spec.ts                # End-to-end test
+  unit/application/task/        # Task use-case unit tests
+  app.e2e-spec.ts               # End-to-end test
 ```
 
-## Architecture Notes
+The domain owns the repository contract. Infrastructure provides its Mongoose implementation; application use cases depend on that contract through a NestJS injection token; presentation controllers
+map HTTP requests to application commands. `ApplicationModule` imports `InfrastructureModule` to make the repository provider available to the use cases.
 
-- The domain defines the task repository contract and injection token.
-- The infrastructure layer implements that contract with Mongoose and maps between domain entities and persistence documents.
-- Application use cases coordinate task operations through the repository contract.
-- Presentation controllers expose the use cases as HTTP routes.
-- Current NestJS wiring is configured through modules: `ApplicationModule` imports `InfrastructureModule` so the use cases can resolve the task repository provider.
-
-## Useful Scripts
+## Tests and Scripts
 
 | Command               | Purpose                                   |
 | --------------------- | ----------------------------------------- |
+| `npm test`            | Run unit tests                            |
+| `npm run test:watch`  | Run unit tests in watch mode              |
+| `npm run test:cov`    | Run unit tests and generate coverage      |
+| `npm run test:e2e`    | Run the Jest end-to-end suite             |
 | `npm run build`       | Compile the application                   |
 | `npm run start`       | Start the application                     |
 | `npm run start:dev`   | Start with watch mode                     |
 | `npm run start:debug` | Start with the debugger and watch mode    |
 | `npm run start:prod`  | Run the compiled application from `dist/` |
-| `npm test`            | Run Jest unit tests                       |
-| `npm run test:e2e`    | Run the Jest end-to-end suite             |
-| `npm run test:cov`    | Run tests and generate coverage           |
-| `npm run lint`        | Run ESLint (configured with auto-fix)     |
+| `npm run lint`        | Run ESLint with automatic fixes           |
 | `npm run format`      | Format TypeScript source and test files   |
+
+The current e2e spec still checks the NestJS starter `GET /` response (`Hello World!`), but the application does not register a root route. Update that assertion to an implemented route before relying
+on `npm run test:e2e` as a passing check.

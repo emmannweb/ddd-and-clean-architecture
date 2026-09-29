@@ -11,11 +11,7 @@ export class ApplicationTaskMapper {
     return new CreateTaskCommand(data.name, data.description, data.list.map(ApplicationListMapper.toEntity));
   }
   static toUpdateCommand(data: UpdateTaskDto): UpdateTaskCommand {
-    return new UpdateTaskCommand(
-      data.name,
-      data.description,
-      data.list?.map(ApplicationListMapper.toEntity),
-    );
+    return new UpdateTaskCommand(data.name, data.description, data.list?.map(ApplicationListMapper.toEntity));
   }
   static toEntity(command: CreateTaskCommand): TaskEntity {
     return new TaskEntity({
@@ -23,5 +19,14 @@ export class ApplicationTaskMapper {
       description: command.description,
       list: command.list,
     });
+  }
+
+  static toDto(entity: TaskEntity): TaskDto {
+    return {
+      _id: entity.getId(),
+      name: entity.getName(),
+      description: entity.getDescription(),
+      list: entity.getList().map(ApplicationListMapper.toDto),
+    };
   }
 }

@@ -5,6 +5,7 @@ Task Dto
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsString, ValidateNested } from 'class-validator';
+import { UUID } from 'crypto';
 
 //task list
 export class TaskListDto {
@@ -19,6 +20,9 @@ export class TaskListDto {
 
 //main task
 export class TaskDto {
+  @ApiProperty({ description: '_id' })
+  readonly _id!: UUID;
+
   @ApiProperty({ description: 'name' })
   @IsString()
   readonly name!: string;

@@ -9,6 +9,8 @@ import { Task, TaskDocument } from '../schemas/task.schema';
 import { TaskEntity } from '@domain/entities/task.entity';
 import { TaskUpdateData } from '@domain/repositories/task.repository';
 import { TaskPersistenceMapper } from '../mappers/task-persistence.mapper';
+import { TaskQueryDto } from '@shared/dtos/taskDto/task.query.dto';
+import { PaginatedResponseDto } from '@shared/pagination/paginated-response.dto';
 
 @Injectable()
 export class TaskPersistence implements TaskRepository {
@@ -24,17 +26,25 @@ export class TaskPersistence implements TaskRepository {
     return TaskPersistenceMapper.toDomain(createdTask);
   }
 
-  async findAll(page: number, limit: number, id?: string): Promise<TaskEntity[]> {
-    const query: any = {};
-    if (id) {
-      query._id = id;
-    }
-    const tasks = await this.taskModel
-      .find(query)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
-    return tasks.map(TaskPersistenceMapper.toDomain);
+  async findAll(request: TaskQueryDto): Promise<PaginatedResponseDto<TaskEntity>> {
+    const { pageNumber = 1, pageSize = 10 } = request;
+
+    const [tasks, totalRecords] = await Promise.all([
+      this.taskModel
+        .find()
+        .skip((pageNumber - 1) * pageSize)
+        .limit(pageSize)
+        .exec(),
+      this.taskModel.countDocuments().exec(),
+    ]);
+
+    return {
+      items: tasks.map(TaskPersistenceMapper.toDomain),
+      totalRecords,
+      pageNumber: Number(pageNumber),
+      pageSize: Number(pageSize),
+      totalPages: Math.ceil(totalRecords / pageSize),
+    };
   }
 
   async update(id: string, data: TaskUpdateData): Promise<TaskEntity | null> {

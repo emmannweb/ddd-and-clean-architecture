@@ -1,4 +1,4 @@
-import { FindTasksUseCase } from './task/find-all-task.use-case';
+import { FindTasksUseCase } from './task/find-tasks.use-case';
 import { CreateTaskUseCase } from './task/create-task.use-case';
 import { UpdateTaskUseCase } from './task/update-task.use-case';
 

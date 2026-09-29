@@ -2,6 +2,7 @@ import { TaskEntity } from '@domain/entities/task.entity';
 import { TaskListEntity } from '@domain/entities/value-objects/task-list.entity';
 import { TaskUpdateData } from '@domain/repositories/task.repository';
 import { Task, TaskDocument } from '../schemas/task.schema';
+import { UUID } from 'crypto';
 
 export class TaskPersistenceMapper {
   static toPersistence(entity: TaskEntity) {
@@ -24,9 +25,9 @@ export class TaskPersistenceMapper {
   }
 
   static toDomain(raw: TaskDocument): TaskEntity {
-    const record = raw as TaskDocument & { created_at?: Date; updated_at?: Date; id?: string };
+    const record = raw as TaskDocument & { created_at?: Date; updated_at?: Date; id?: UUID };
     return new TaskEntity({
-      _id: record._id?.toString() ?? record.id,
+      _id: record.id,
       name: record.name,
       description: record.description,
       list: (record.list ?? []).map(
