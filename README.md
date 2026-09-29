@@ -51,13 +51,13 @@ Replace `3000` with the configured `PORT` when using a different port.
 
 ### Tasks
 
-| Method  | Route       | Description                                   |
-| ------- | ----------- | --------------------------------------------- |
-| `POST`  | `/task`     | Create a task                                 |
-| `GET`   | `/task`     | List tasks, optionally filtered and paginated |
-| `PATCH` | `/task/:id` | Partially update a task                       |
+| Method  | Route        | Description                                   |
+| ------- | ------------ | --------------------------------------------- |
+| `POST`  | `/tasks`     | Create a task                                 |
+| `GET`   | `/tasks`     | List tasks, optionally filtered and paginated |
+| `PATCH` | `/tasks/:id` | Partially update a task                       |
 
-`GET /task` accepts these query parameters:
+`GET /tasks` accepts these query parameters:
 
 | Parameter | Default | Description                       |
 | --------- | ------- | --------------------------------- |

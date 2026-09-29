@@ -7,7 +7,7 @@ import { FindTasksUseCase } from '@application/use-cases/task/find-all-task.use-
 import { UpdateTaskUseCase } from '@application/use-cases/task/update-task.use-case';
 
 @ApiTags('Task')
-@Controller('task')
+@Controller('tasks')
 export class TaskController {
   constructor(
     private readonly createTaskUseCase: CreateTaskUseCase,
