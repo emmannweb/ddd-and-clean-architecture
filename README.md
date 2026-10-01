@@ -24,9 +24,12 @@ PORT=3000
 LOG_LEVEL=info
 ```
 
-`MONGODB_URI` defaults to `mongodb://localhost:27017/tasknew`; `PORT` defaults to `3000`. `LOG_LEVEL` is optional and defaults to `debug` outside production and `info` in production.
+`MONGODB_URI` currently defaults to `mongodb://localhost:27017/tasknew`; `PORT` defaults to `3000`. `LOG_LEVEL` is optional and defaults to `debug` outside production and `info` in production. Set
+`MONGODB_URI` explicitly in production: the current configuration does not reject a missing value and will still fall back to localhost.
 
-HTTP access logs are written to stdout with the request ID, method, path, status, and response duration. Development logs are formatted for readability; production logs are structured JSON. The `X-Request-Id` header is validated if supplied, otherwise a UUID is generated and returned in the response header. Request headers and query-string values are omitted from access logs. Unhandled server errors are logged with their stack and request context; client responses receive a consistent error body without internal server details.
+HTTP access logs are written to stdout with the request ID, method, path, status, and response duration. Development logs are formatted for readability; production logs are structured JSON. The
+`X-Request-Id` header is validated if supplied, otherwise a UUID is generated and returned in the response header. Request headers and query-string values are omitted from access logs. Unhandled
+server errors are logged with their stack and request context; client responses receive a consistent error body without internal server details.
 
 Start in development mode:
 
@@ -108,6 +111,7 @@ src/
     database/                   # MongoDB connection, schemas, persistence, and mappers
     documentation/              # Swagger configuration
     health/                     # Health endpoint and checks
+    logging/                    # Global HTTP exception filter
   presentation/
     controllers/                # HTTP task controller
   shared/
