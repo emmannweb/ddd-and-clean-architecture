@@ -8,6 +8,7 @@ import { FindTasksUseCase } from '@application/use-cases/task/find-tasks.use-cas
 import { UpdateTaskUseCase } from '@application/use-cases/task/update-task.use-case';
 import { TaskQueryDto } from '@shared/dtos/taskDto/task.query.dto';
 import { PaginatedResponseDto } from '@shared/pagination/paginated-response.dto';
+import { CreateTaskDto } from '@shared/dtos/taskDto/create.task.dto';
 
 @ApiTags('Task')
 @Controller('tasks')
@@ -20,7 +21,7 @@ export class TaskController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() request: TaskDto) {
+  async create(@Body() request: CreateTaskDto): Promise<TaskDto> {
     const command = ApplicationTaskMapper.toTaskCommand(request);
     return await this.createTaskUseCase.execute(command);
   }
@@ -34,7 +35,7 @@ export class TaskController {
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  async findAndUpdate(@Param('id') id: string, @Body() request: UpdateTaskDto) {
+  async findAndUpdate(@Param('id') id: string, @Body() request: UpdateTaskDto): Promise<TaskDto> {
     const command = ApplicationTaskMapper.toUpdateCommand(request);
     return await this.updateTaskUseCase.execute(id, command);
   }

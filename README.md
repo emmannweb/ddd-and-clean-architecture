@@ -21,9 +21,12 @@ The application loads environment variables from a root `.env` file. Both settin
 ```env
 MONGODB_URI=mongodb://localhost:27017/tasknew
 PORT=3000
+LOG_LEVEL=info
 ```
 
-`MONGODB_URI` defaults to `mongodb://localhost:27017/tasknew`; `PORT` defaults to `3000`.
+`MONGODB_URI` defaults to `mongodb://localhost:27017/tasknew`; `PORT` defaults to `3000`. `LOG_LEVEL` is optional and defaults to `debug` outside production and `info` in production.
+
+HTTP access logs are written to stdout with the request ID, method, path, status, and response duration. Development logs are formatted for readability; production logs are structured JSON. The `X-Request-Id` header is validated if supplied, otherwise a UUID is generated and returned in the response header. Request headers and query-string values are omitted from access logs. Unhandled server errors are logged with their stack and request context; client responses receive a consistent error body without internal server details.
 
 Start in development mode:
 

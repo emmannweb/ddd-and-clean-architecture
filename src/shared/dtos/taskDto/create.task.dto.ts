@@ -1,17 +1,9 @@
-/*
-Task Dto
-*/
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, ValidateNested } from 'class-validator';
-import { UUID } from 'crypto';
 import { TaskListDto } from './task.list.dto';
+import { Type } from 'class-transformer';
 
-//main task
-export class TaskDto {
-  @ApiProperty({ description: '_id' })
-  readonly _id!: UUID;
-
+export class CreateTaskDto {
   @ApiProperty({ description: 'name' })
   @IsString()
   readonly name!: string;
@@ -25,5 +17,3 @@ export class TaskDto {
   @ApiProperty({ type: [TaskListDto] })
   list!: TaskListDto[];
 }
-
-export class UpdateTaskDto extends PartialType(TaskDto) {}

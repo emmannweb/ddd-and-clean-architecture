@@ -2,12 +2,13 @@ import { CreateTaskCommand, UpdateTaskCommand } from '@application/commands/expo
 import { TaskEntity } from '@domain/entities/task.entity';
 import { ApplicationListMapper } from './complements/list.mapper';
 import { TaskDto, UpdateTaskDto } from '@shared/dtos/taskDto/task.dto';
+import { CreateTaskDto } from '@shared/dtos/taskDto/create.task.dto';
 
 /*
 Task Application Mapper
 */
 export class ApplicationTaskMapper {
-  static toTaskCommand(data: TaskDto): CreateTaskCommand {
+  static toTaskCommand(data: CreateTaskDto): CreateTaskCommand {
     return new CreateTaskCommand(data.name, data.description, data.list.map(ApplicationListMapper.toEntity));
   }
   static toUpdateCommand(data: UpdateTaskDto): UpdateTaskCommand {

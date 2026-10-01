@@ -1,5 +1,5 @@
 import { TaskListEntity } from '@domain/entities/value-objects/task-list.entity';
-import { TaskListDto } from '@shared/dtos/taskDto/task.dto';
+import { TaskListDto } from '@shared/dtos/taskDto/task.list.dto';
 
 /*
 Task Application Mapper
